@@ -28,7 +28,12 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fasw+j(6=-wp(%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True' # Use environment variable for DEBUG
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') # Use environment variable for ALLOWED_HOSTS
+ALLOWED_HOSTS = [
+    'exitclear.onrender.com',  # Replace with your actual Render URL
+    'localhost',                # For local development
+    '127.0.0.1',                # For local development
+]
+
 
 
 # Application definition
@@ -44,7 +49,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework.authtoken',
-    # 'storages', # Uncomment if you plan to use Amazon S3 for static/media files
 ]
 
 MIDDLEWARE = [
@@ -90,6 +94,24 @@ DATABASES = {
 }
 
 
+
+
+
+
+if os.environ.get('RENDER') == 'true':  # environment variable set on Render
+    # Production (on Render)
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    # Local development
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -132,44 +154,31 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# AWS S3 for Static and Media files (uncomment and configure if using S3)
-# AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-# AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-# AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-# AWS_S3_FILE_OVERWRITE = False
-# AWS_DEFAULT_ACL = None
-
-# # Static files with S3
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# STATIC_LOCATION = 'static'
-# STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
-
-# # Media files with S3
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# MEDIA_LOCATION = 'media'
-# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+
+
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://smart.iqraahosptal.in"
+    "http://localhost:5173"
 ]
-# For production, it's safer to use CORS_ALLOWED_ORIGINS
-# If you need to allow all origins (less secure, use with caution for testing)
-# CORS_ALLOW_ALL_ORIGINS = True
 
-# CSRF_TRUSTED_ORIGINS can be used for POST requests from your React app
-# CSRF_TRUSTED_ORIGINS = [
-#     "https://your-react-app.com",
-# ]
 
-# REST Framework settings (optional, but good practice for production)
+CSRF_TRUSTED_ORIGINS = [
+    'https://exitclear.onrender.com',  # Must include https://
+    'http://localhost:8000',            # Keep http:// for local dev
+
+]
+
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
@@ -179,3 +188,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated', # Require authentication by default
     ),
 }
+
+
